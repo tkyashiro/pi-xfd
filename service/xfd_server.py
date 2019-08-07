@@ -11,7 +11,7 @@ class XfdServer:
 
     def __init__(self, path_to_database=""):
         self._database = db.XfdServerDb(path_to_database)
-        self._address = self._database.load_address()
+        (self._job_id, self._address) = self._database.load_address()
 
     def run(self):
         loop = asyncio.get_event_loop()
@@ -27,11 +27,17 @@ class XfdServer:
     async def _update(self):
         try:
             print("update")
-            response = requests.post(self._address)
-            json_obj = json.load(response.text) 
+            # response = requests.post(self._address + "/lastBuild/api/json?pretty=true&tree=number,result,url")
+            # json_obj = json.load(response.text) 
 
+            json_obj = {
+                "number" : "1",
+                "result" : "SUCCESS",
+                "url" : "http://hogehoge.jp",
+            }
+ 
             ## todo update only when the result is newer
-            self._database.save_result(json_obj)
+            self._database.save_result(self._job_id, json_obj["number"], json_obj["result"])
         except requests.exceptions.ConnectionError as ex:
             print(ex)
 

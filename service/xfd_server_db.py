@@ -32,8 +32,8 @@ class XfdServerDb:
                     state TEXT NOT NULL
                 ) ''')
 
-                c.execute('''INSERT INTO states(state_id, state) VALUES(-1, "Failure")''')
-                c.execute('''INSERT INTO states(state_id, state) VALUES( 1, "Success")''')
+                c.execute('''INSERT INTO states(state_id, state) VALUES(-1, "FAILURE")''')
+                c.execute('''INSERT INTO states(state_id, state) VALUES( 1, "SUCCESS")''')
 
                 c.execute('''CREATE TABLE results (
                     job_id INTEGER NOT NULL,
@@ -52,12 +52,17 @@ class XfdServerDb:
 
     def load_address(self):
         # todo load it from DB
-        return "http://localhost:8080/job/hoge/api/json"
+        return 1, "http://localhost:8080/job/hoge/api/json"
 
-    def save_result(self, json_obj):
+    def save_result(self, job_id, build_id, state):
         try:
             with closing(sql.connect(self._path_to_database)) as conn:
                 c = conn.cursor()
+                state_id = state
+                c.execute('''INSERT INTO results VALUES(?,?,?)''',
+                     (job_id, build_id, 1 if state == "SUCCESS" else -1))
+                conn.commit()
+
         except sql.Error:
             print(sys.exc_info())
 
