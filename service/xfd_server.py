@@ -26,15 +26,18 @@ class XfdServer:
 
     async def _update(self):
         try:
-            print("update")
-            # response = requests.post(self._address + "/lastBuild/api/json?pretty=true&tree=number,result,url")
-            # json_obj = json.load(response.text) 
+            # print("update")
+            response = requests.post(self._address + "/lastBuild/api/json?pretty=true&tree=number,result,url")
 
-            json_obj = {
-                "number" : "1",
-                "result" : "SUCCESS",
-                "url" : "http://hogehoge.jp",
-            }
+            print (response)
+
+            json_obj = json.loads(response.text) 
+
+            # json_obj = {
+            #     "number" : "1",
+            #     "result" : "SUCCESS",
+            #     "url" : "http://hogehoge.jp",
+            # }
  
             ## todo update only when the result is newer
             self._database.save_result(self._job_id, json_obj["number"], json_obj["result"])

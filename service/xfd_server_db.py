@@ -52,7 +52,8 @@ class XfdServerDb:
 
     def load_address(self):
         # todo load it from DB
-        return 1, "http://localhost:8080/job/hoge/api/json"
+        # return 1, "http://localhost:8080/job/hoge/api/json"
+        return 1, "http://10.127.25.233:8080/job/Hathor/"
 
     def save_result(self, job_id, build_id, state):
         try:
