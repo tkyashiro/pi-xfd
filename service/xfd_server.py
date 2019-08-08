@@ -38,9 +38,26 @@ class XfdServer:
             #     "result" : "SUCCESS",
             #     "url" : "http://hogehoge.jp",
             # }
+
+            build_id = json_obj["number"]
+            build_result = json_obj["result"]
  
             ## todo update only when the result is newer
-            self._database.save_result(self._job_id, json_obj["number"], json_obj["result"])
+            exists, latest_build_id, state_id = self._database.get_latest_result(self._job_id)
+
+            # print (build_id, ", ", latest_build_id, ", ", state_id)
+
+            newdata = (not exists) or (build_id != latest_build_id)
+
+            if newdata:
+                print ("New Result [{}] : {}".format(build_id,state_id))
+
+                # TODO control xfd device
+                
+                self._database.save_result(self._job_id, build_id, build_result)
+            else:
+                print ("Existing Result [{}] : {}".format(build_id,state_id))
+
         except requests.exceptions.ConnectionError as ex:
             print(ex)
 

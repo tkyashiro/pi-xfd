@@ -55,6 +55,26 @@ class XfdServerDb:
         # return 1, "http://localhost:8080/job/hoge/api/json"
         return 1, "http://10.127.25.233:8080/job/Hathor/"
 
+    # returns  (exists:bool, build_id, state_id)
+    def get_latest_result(self, job_id):
+        try:
+            with closing(sql.connect(self._path_to_database)) as conn:
+                c = conn.cursor()
+
+                c.execute('''SELECT * FROM results
+                    WHERE job_id = ?
+                    ORDER BY build_id DESC LIMIT 1''', (job_id,))
+
+                row = c.fetchone()
+
+                if row is None:
+                    return False, None, None
+                else:
+                    return True, row[1], row[2]
+        except sql.Error:
+            print (sys.exc_info())
+            raise
+
     def save_result(self, job_id, build_id, state):
         try:
             with closing(sql.connect(self._path_to_database)) as conn:
